@@ -6,12 +6,13 @@ import EmergencySection from "@/components/EmergencySection";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, Star, Users, Award, Phone, Mail } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const Index = () => {
   return (
     <div className="min-h-screen">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-border/40 z-50">
+      <nav className="fixed top-0 w-full bg-background/80 backdrop-blur-md border-b border-border/40 z-50 transition-colors duration-300">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center">
             <div className="w-10 h-10 bg-gradient-maternal rounded-full flex items-center justify-center mr-3">
@@ -24,6 +25,7 @@ const Index = () => {
             <a href="#features" className="text-sm text-muted-foreground hover:text-primary transition-colors">Features</a>
             <a href="#pricing" className="text-sm text-muted-foreground hover:text-primary transition-colors">Pricing</a>
             <a href="#support" className="text-sm text-muted-foreground hover:text-primary transition-colors">Support</a>
+            <ThemeToggle />
             <Button variant="maternal" size="sm">Get Started</Button>
           </div>
         </div>

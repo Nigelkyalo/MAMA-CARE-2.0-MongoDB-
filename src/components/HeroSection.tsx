@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Heart, Shield, Bell, Users } from "lucide-react";
-import heroImage from "@/assets/hero-mamacare.jpg";
+import heroImage from "@/assets/hero-african-woman.jpg";
 
 const HeroSection = () => {
   const features = [
@@ -99,7 +99,7 @@ const HeroSection = () => {
               />
               
               {/* Floating notification cards */}
-              <div className="absolute -top-4 -right-4 bg-white rounded-2xl p-4 shadow-card animate-pulse-gentle">
+              <div className="absolute -top-4 -right-4 bg-card rounded-2xl p-4 shadow-card animate-pulse-gentle border border-border/20">
                 <div className="flex items-center">
                   <div className="w-8 h-8 bg-gradient-wellness rounded-full flex items-center justify-center mr-3">
                     <Bell className="w-4 h-4 text-wellness-foreground" />
@@ -111,7 +111,7 @@ const HeroSection = () => {
                 </div>
               </div>
 
-              <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl p-4 shadow-card animate-pulse-gentle" style={{animationDelay: '1.5s'}}>
+              <div className="absolute -bottom-4 -left-4 bg-card rounded-2xl p-4 shadow-card animate-pulse-gentle border border-border/20" style={{animationDelay: '1.5s'}}>
                 <div className="flex items-center">
                   <div className="w-8 h-8 bg-gradient-maternal rounded-full flex items-center justify-center mr-3">
                     <Heart className="w-4 h-4 text-primary-foreground" />
