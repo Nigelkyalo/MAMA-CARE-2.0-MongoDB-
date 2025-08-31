@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, Star, Users, Award, Phone, Mail } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   return (
@@ -22,11 +23,13 @@ const Index = () => {
           </div>
           
           <div className="hidden md:flex items-center space-x-6">
-            <a href="#features" className="text-sm text-muted-foreground hover:text-primary transition-colors">Features</a>
+            <Link to="/features" className="text-sm text-muted-foreground hover:text-primary transition-colors">Features</Link>
             <a href="#pricing" className="text-sm text-muted-foreground hover:text-primary transition-colors">Pricing</a>
-            <a href="#support" className="text-sm text-muted-foreground hover:text-primary transition-colors">Support</a>
+            <Link to="/support" className="text-sm text-muted-foreground hover:text-primary transition-colors">Support</Link>
             <ThemeToggle />
-            <Button variant="maternal" size="sm">Get Started</Button>
+            <Link to="/get-started">
+              <Button variant="maternal" size="sm">Get Started</Button>
+            </Link>
           </div>
         </div>
       </nav>
@@ -136,13 +139,17 @@ const Index = () => {
             smart reminders, and emergency support.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-white text-primary hover:bg-white/90">
-              Start Free Trial
-              <Heart className="w-5 h-5 ml-2" />
-            </Button>
-            <Button variant="outline" size="lg" className="border-white/40 text-primary-foreground hover:bg-white/10">
-              Download App
-            </Button>
+            <Link to="/get-started">
+              <Button size="lg" className="bg-white text-primary hover:bg-white/90">
+                Start Free Trial
+                <Heart className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
+            <Link to="/download-app">
+              <Button variant="outline" size="lg" className="border-white/40 text-primary-foreground hover:bg-white/10">
+                Download App
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -176,10 +183,10 @@ const Index = () => {
             <div>
               <h4 className="font-semibold text-foreground mb-4">Support</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>Help Center</li>
-                <li>Contact Us</li>
-                <li>Privacy Policy</li>
-                <li>Terms of Service</li>
+                <li><Link to="/help-center" className="hover:text-primary transition-colors">Help Center</Link></li>
+                <li><Link to="/contact-us" className="hover:text-primary transition-colors">Contact Us</Link></li>
+                <li><Link to="/privacy-policy" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
+                <li><Link to="/terms-of-service" className="hover:text-primary transition-colors">Terms of Service</Link></li>
               </ul>
             </div>
 
