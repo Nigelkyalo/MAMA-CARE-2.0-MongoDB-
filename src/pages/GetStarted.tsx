@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { 
   Heart, 
   Calendar, 
@@ -19,7 +19,7 @@ import {
   ShieldCheck
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth } from "@/context/auth-context";
 
 type CalculationMethod = "dueDate" | "lastMenstrualPeriod";
 
@@ -55,13 +55,13 @@ const HEALTH_CONDITIONS = [
 
 const LANGUAGES = ["english", "swahili", "kikuyu", "luo"] as const;
 const COUNTIES = ["nairobi", "mombasa", "kisumu", "nakuru", "other"] as const;
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:4000";
 
 const GetStarted = () => {
   const [step, setStep] = useState(1);
   const totalSteps = 4;
   const progress = (step / totalSteps) * 100;
-  const { isSignedIn, getToken } = useAuth();
+  const { isAuthenticated, token, user, logout } = useAuth();
 
   const [profile, setProfile] = useState<PregnancyProfileInput>({
     firstName: "",
@@ -88,6 +88,16 @@ const GetStarted = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    setProfile((prev) => ({
+      ...prev,
+      firstName: prev.firstName || user.firstName,
+      lastName: prev.lastName || user.lastName,
+      email: prev.email || user.email,
+    }));
+  }, [user]);
 
   const nextStep = () => {
     if (step < totalSteps) {
@@ -147,7 +157,7 @@ const GetStarted = () => {
   }, [profile]);
 
   const handleComplete = async () => {
-    if (!isSignedIn) {
+    if (!isAuthenticated || !token) {
       setStatus({
         type: "error",
         message: "Please sign in with your MamaCare account before completing setup.",
@@ -167,11 +177,6 @@ const GetStarted = () => {
     setStatus(null);
 
     try {
-      const token = await getToken();
-      if (!token) {
-        throw new Error("Unable to retrieve authentication token.");
-      }
-
       const payload = {
         ...profile,
         reminders: {
@@ -227,15 +232,50 @@ const GetStarted = () => {
             <span className="text-xl font-bold text-primary">MamaCare</span>
           </Link>
           
-          <div className="hidden md:flex items-center space-x-6">
-            <Link to="/features" className="text-sm text-muted-foreground hover:text-primary transition-colors">Features</Link>
-            <Link to="/support" className="text-sm text-muted-foreground hover:text-primary transition-colors">Support</Link>
+          <div className="hidden md:flex items-center space-x-4">
+            <Link to="/features" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              Features
+            </Link>
+            <Link to="/support" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              Support
+            </Link>
+            {isAuthenticated && user ? (
+              <>
+                <span className="text-sm text-muted-foreground">Hello, {user.firstName}</span>
+                <Button size="sm" variant="outline" onClick={logout}>
+                  Log out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  Log in
+                </Link>
+                <Button asChild size="sm" variant="maternal">
+                  <Link to="/signup">Create account</Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </nav>
 
       <div className="pt-24 pb-16 px-4">
         <div className="container mx-auto max-w-4xl">
+          {!isAuthenticated && (
+            <div className="mb-8 rounded-xl border border-dashed border-primary/40 bg-primary/5 p-4 text-center text-sm text-primary">
+              You need a MamaCare account to save your pregnancy profile.{" "}
+              <Link to="/signup" className="font-semibold underline">
+                Create one here
+              </Link>{" "}
+              or{" "}
+              <Link to="/login" className="font-semibold underline">
+                sign in
+              </Link>{" "}
+              if you already registered.
+            </div>
+          )}
+
           {/* Progress Header */}
           <div className="text-center mb-8">
             <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
