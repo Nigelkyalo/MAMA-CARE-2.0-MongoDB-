@@ -7,8 +7,7 @@
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
     "start": "node --loader ts-node/esm --es-module src/index.ts",
-    "start:dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "postinstall": "npm run build"
+    "start:dev": "ts-node-dev --respawn --transpile-only src/index.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
