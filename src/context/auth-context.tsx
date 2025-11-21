@@ -77,17 +77,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (!response.ok) {
-        const errorBody = await response.json().catch(() => ({}));
-        throw new Error(errorBody.error || `Authentication failed: ${response.status} ${response.statusText}`);
+        let errorMessage = `Authentication failed: ${response.status} ${response.statusText}`;
+        try {
+          const errorBody = await response.json();
+          errorMessage = errorBody.error || errorMessage;
+        } catch {
+          // If response is not JSON, use status text
+          const text = await response.text().catch(() => "");
+          if (text) {
+            errorMessage = text;
+          }
+        }
+        throw new Error(errorMessage);
       }
 
-      return response.json() as Promise<{ token: string; user: AuthUser }>;
+      const data = await response.json();
+      if (!data.token || !data.user) {
+        throw new Error("Invalid response from server: missing token or user data");
+      }
+      return data as { token: string; user: AuthUser };
     } catch (error) {
       // Handle network errors or other fetch failures
-      if (error instanceof TypeError && error.message.includes("fetch")) {
+      if (error instanceof TypeError && (error.message.includes("fetch") || error.message.includes("Failed to fetch"))) {
         throw new Error(`Unable to connect to server. Please check if the backend is running at ${API_BASE_URL}`);
       }
-      // Re-throw other errors
+      // Re-throw other errors (including our custom Error)
       throw error;
     }
   };

@@ -85,7 +85,11 @@ const EmergencySection = () => {
                 <h4 className="font-semibold text-wellness-foreground mb-2">
                   Find Nearest Hospital
                 </h4>
-                <Button variant="outline" className="border-wellness-foreground text-wellness-foreground hover:bg-wellness-foreground hover:text-wellness">
+                <Button 
+                  variant="outline" 
+                  className="border-wellness-foreground text-wellness-foreground hover:bg-wellness-foreground hover:text-wellness"
+                  onClick={() => window.open("https://www.google.com/maps/@-1.2875376,36.8142597,15z?entry=ttu&g_ep=EgoyMDI1MTExNy4wIKXMDSoASAFQAw%3D%3D", "_blank")}
+                >
                   Open Maps
                 </Button>
               </CardContent>

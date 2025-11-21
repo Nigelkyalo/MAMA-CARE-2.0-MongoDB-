@@ -231,6 +231,48 @@ app.use("/api", (_req: Request, res: Response) => {
   res.status(404).json({ error: "Not found" });
 });
 
+// Seed default user on server start
+async function seedDefaultUser() {
+  try {
+    const users = await getCollection<UserDocument>("users");
+    const defaultEmail = "kyalomuchende@gmail.com";
+    const defaultPassword = "123456";
+    
+    const existing = await users.findOne({ email: defaultEmail });
+    if (existing) {
+      console.log("Default user already exists");
+      return;
+    }
+
+    const passwordHash = await bcrypt.hash(defaultPassword, 10);
+    const now = new Date();
+    const userDocument: UserDocument = {
+      _id: new ObjectId(),
+      firstName: "Nigel",
+      lastName: "Kyalo",
+      email: defaultEmail,
+      passwordHash,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    await users.insertOne(userDocument);
+    console.log("Default user created successfully:", defaultEmail);
+  } catch (error) {
+    console.error("Failed to seed default user:", error);
+  }
+}
+
+// Initialize database and seed user
+getDb()
+  .then(() => {
+    console.log("Database connected");
+    return seedDefaultUser();
+  })
+  .catch((error) => {
+    console.error("Failed to connect to database:", error);
+  });
+
 app.listen(PORT, () => {
   console.log(`Backend listening on http://localhost:${PORT}`);
 });
