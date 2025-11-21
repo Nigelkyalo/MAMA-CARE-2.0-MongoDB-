@@ -1,97 +1,200 @@
-# Welcome to your Lovable project
+# MamaCare - Pregnancy Care Application
 
-## Project info
+A comprehensive pregnancy care application built with React, TypeScript, and MongoDB Atlas. MamaCare helps expecting mothers track their pregnancy journey, manage appointments, receive health tips, and stay connected with healthcare providers.
 
-**URL**: https://lovable.dev/projects/2f96eebd-7470-411e-b85f-1791d7d3f091
+**Live Application**: [https://mama-care-2-0-mongo-db.vercel.app/](https://mama-care-2-0-mongo-db.vercel.app/)
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+- 📅 **Pregnancy Tracking**: Track your pregnancy progress with personalized timelines
+- 🔔 **Smart Reminders**: Never miss appointments, medications, or important health tips
+- 🏥 **Healthcare Management**: Connect with your preferred hospitals and clinics
+- 💬 **Multi-language Support**: Available in English, Swahili, Kikuyu, and Luo
+- 🔐 **Secure Authentication**: User registration and login with JWT token-based authentication
+- 📱 **Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
 
-**Use Lovable**
+## Technologies
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/2f96eebd-7470-411e-b85f-1791d7d3f091) and start prompting.
+This project is built with modern web technologies:
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Frontend**:
+  - React 18
+  - TypeScript
+  - Vite
+  - Tailwind CSS
+  - shadcn/ui components
+  - React Router DOM
+  - React Query (TanStack Query)
 
-**Use your preferred IDE**
+- **Backend**:
+  - Node.js
+  - Express.js
+  - MongoDB Atlas
+  - JWT for authentication
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **Database**:
+  - MongoDB Atlas (Cloud Database)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/2f96eebd-7470-411e-b85f-1791d7d3f091) and click on Share -> Publish.
-
-## MongoDB Atlas configuration
-
-The application now targets your MongoDB Atlas cluster at `cluster101.chqmam8.mongodb.net` using the `kyalomuchende_db_user` credentials you provided. To run locally or in any hosting provider, create `.env` files that mirror the provided `env.example` files:
+## Project Structure
 
 ```
-MONGODB_URI=mongodb+srv://kyalomuchende_db_user:1234@cluster101.chqmam8.mongodb.net/mamacare?retryWrites=true&w=majority
-MONGODB_DB=mamacare
-VITE_MONGODB_URI=mongodb+srv://kyalomuchende_db_user:1234@cluster101.chqmam8.mongodb.net/mamacare?retryWrites=true&w=majority
-VITE_MONGODB_DB=mamacare
-VITE_API_BASE_URL=http://localhost:4000
+expecting-ease-care/
+├── backend/          # Express.js backend API
+├── src/             # React frontend application
+│   ├── components/  # Reusable UI components
+│   ├── pages/       # Page components
+│   ├── context/     # React context providers
+│   └── lib/         # Utility functions and database connections
+├── public/          # Static assets
+└── supabase/        # Supabase configuration (legacy - removed)
 ```
 
-Replicate the same MongoDB values inside `backend/.env` and add a `JWT_SECRET` for signing auth tokens. Once those environment variables are present, both the backend API and any server-side utilities will connect directly to the Atlas database.
+## Getting Started
 
-## Local authentication (Get Started & Login)
+### Prerequisites
 
-The Supabase helpers were removed in favor of a lightweight credential-based flow backed by MongoDB Atlas:
+- Node.js (v18 or higher)
+- npm or yarn
+- MongoDB Atlas account (or local MongoDB instance)
 
-- `POST /api/auth/signup` – creates a user (first/last name, email, password) and returns a signed token.
-- `POST /api/auth/login` – verifies credentials and returns a token plus the user profile.
-- `POST /api/pregnancy-profile` – now expects a `Bearer <token>` header so only signed-in users can save their journey.
+### Installation
 
-On the frontend, visit `/signup` to create an account or `/login` to sign back in. Successful auth sessions are stored in localStorage and power the multi-step Get Started experience at `/get-started`.
+1. **Clone the repository**
+   ```sh
+   git clone https://github.com/Nigelkyalo/MAMA-CARE-2.0-MongoDB-.git
+   cd MAMA-CARE-2.0-MongoDB-
+   ```
 
-## Can I connect a custom domain to my Lovable project?
+2. **Install frontend dependencies**
+   ```sh
+   npm install
+   ```
 
-Yes, you can!
+3. **Install backend dependencies**
+   ```sh
+   cd backend
+   npm install
+   cd ..
+   ```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+4. **Set up environment variables**
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+   Create a `.env` file in the root directory:
+   ```env
+   MONGODB_URI=mongodb+srv://kyalomuchende_db_user:1234@cluster101.chqmam8.mongodb.net/mamacare?retryWrites=true&w=majority
+   MONGODB_DB=mamacare
+   VITE_MONGODB_URI=mongodb+srv://kyalomuchende_db_user:1234@cluster101.chqmam8.mongodb.net/mamacare?retryWrites=true&w=majority
+   VITE_MONGODB_DB=mamacare
+   VITE_API_BASE_URL=http://localhost:4000
+   JWT_SECRET=your_jwt_secret_key_here
+   ```
+
+   Create a `backend/.env` file:
+   ```env
+   PORT=4000
+   MONGODB_URI=mongodb+srv://kyalomuchende_db_user:1234@cluster101.chqmam8.mongodb.net/mamacare?retryWrites=true&w=majority
+   MONGODB_DB=mamacare
+   JWT_SECRET=your_jwt_secret_key_here
+   ```
+
+5. **Start the development servers**
+
+   Terminal 1 - Frontend:
+   ```sh
+   npm run dev
+   ```
+   The frontend will be available at `http://localhost:8080` (or another port if 8080 is in use)
+
+   Terminal 2 - Backend:
+   ```sh
+   cd backend
+   npm run dev
+   ```
+   The backend API will be available at `http://localhost:4000`
+
+## MongoDB Atlas Configuration
+
+The application is configured to use MongoDB Atlas cloud database:
+
+- **Cluster**: `cluster101.chqmam8.mongodb.net`
+- **Database**: `mamacare`
+- **Authentication**: Username-based authentication with MongoDB Atlas
+
+Ensure your MongoDB Atlas cluster allows connections from your IP address and that the credentials in your `.env` files match your Atlas configuration.
+
+## Authentication System
+
+MamaCare uses a custom authentication system built with JWT tokens:
+
+### API Endpoints
+
+- `POST /api/auth/signup` - Register a new user
+  - Requires: `firstName`, `lastName`, `email`, `password`
+  - Returns: JWT token and user profile
+
+- `POST /api/auth/login` - Authenticate existing user
+  - Requires: `email`, `password`
+  - Returns: JWT token and user profile
+
+- `POST /api/pregnancy-profile` - Save pregnancy profile (Protected)
+  - Requires: `Authorization: Bearer <token>` header
+  - Requires: Complete pregnancy profile data
+
+### Frontend Routes
+
+- `/login` - User login page
+- `/signup` - User registration page
+- `/get-started` - Multi-step pregnancy profile setup (requires authentication)
+
+## Deployment
+
+The application is deployed on Vercel:
+
+- **Production URL**: [https://mama-care-2-0-mongo-db.vercel.app/](https://mama-care-2-0-mongo-db.vercel.app/)
+
+### Deploying to Vercel
+
+1. Connect your GitHub repository to Vercel
+2. Configure environment variables in Vercel dashboard
+3. Set build commands:
+   - Build command: `npm run build`
+   - Output directory: `dist`
+4. Deploy!
+
+### Environment Variables for Production
+
+Make sure to set all the environment variables in your Vercel project settings, including:
+- `MONGODB_URI`
+- `MONGODB_DB`
+- `VITE_MONGODB_URI`
+- `VITE_MONGODB_DB`
+- `VITE_API_BASE_URL` (your backend API URL)
+- `JWT_SECRET`
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+## Author
+
+**Nigel Kyalo**
+- GitHub: [@Nigelkyalo](https://github.com/Nigelkyalo)
+- Project Repository: [MAMA-CARE-2.0-MongoDB-](https://github.com/Nigelkyalo/MAMA-CARE-2.0-MongoDB-)
+
+## Support
+
+For support, please open an issue in the GitHub repository or contact the project maintainers.
+
+---
+
+**Note**: This application is designed to support expecting mothers throughout their pregnancy journey. Always consult with healthcare professionals for medical advice.
