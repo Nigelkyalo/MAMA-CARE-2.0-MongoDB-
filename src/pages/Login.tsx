@@ -80,12 +80,6 @@ const Login = () => {
               {isSubmitting ? "Signing in..." : "Sign in"}
             </Button>
           </form>
-          <p className="mt-6 text-center text-sm text-muted-foreground">
-            Need an account?{" "}
-            <Link to="/signup" className="font-semibold text-primary hover:underline">
-              Create one now
-            </Link>
-          </p>
         </CardContent>
       </Card>
     </div>

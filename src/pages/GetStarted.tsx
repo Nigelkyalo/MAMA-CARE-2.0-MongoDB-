@@ -253,14 +253,11 @@ const GetStarted = () => {
                 </Button>
               </>
             ) : (
-              <>
-                <Link to="/login" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              <Link to="/login">
+                <Button size="sm" variant="maternal">
                   Log in
-                </Link>
-                <Button asChild size="sm" variant="maternal">
-                  <Link to="/signup">Create account</Link>
                 </Button>
-              </>
+              </Link>
             )}
           </div>
         </div>
@@ -268,19 +265,6 @@ const GetStarted = () => {
 
       <div className="pt-24 pb-16 px-4">
         <div className="container mx-auto max-w-4xl">
-          {!isAuthenticated && (
-            <div className="mb-8 rounded-xl border border-dashed border-primary/40 bg-primary/5 p-4 text-center text-sm text-primary">
-              You need a MamaCare account to save your pregnancy profile.{" "}
-              <Link to="/signup" className="font-semibold underline">
-                Create one here
-              </Link>{" "}
-              or{" "}
-              <Link to="/login" className="font-semibold underline">
-                sign in
-              </Link>{" "}
-              if you already registered.
-            </div>
-          )}
 
           {/* Progress Header */}
           <div className="text-center mb-8">

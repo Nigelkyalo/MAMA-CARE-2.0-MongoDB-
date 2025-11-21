@@ -67,20 +67,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const performAuthRequest = async (path: string, body: Record<string, unknown>) => {
-    const response = await fetch(`${API_BASE_URL}${path}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
+    try {
+      const response = await fetch(`${API_BASE_URL}${path}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
 
-    if (!response.ok) {
-      const errorBody = await response.json().catch(() => ({}));
-      throw new Error(errorBody.error || "Authentication failed. Please try again.");
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        throw new Error(errorBody.error || `Authentication failed: ${response.status} ${response.statusText}`);
+      }
+
+      return response.json() as Promise<{ token: string; user: AuthUser }>;
+    } catch (error) {
+      // Handle network errors or other fetch failures
+      if (error instanceof TypeError && error.message.includes("fetch")) {
+        throw new Error(`Unable to connect to server. Please check if the backend is running at ${API_BASE_URL}`);
+      }
+      // Re-throw other errors
+      throw error;
     }
-
-    return response.json() as Promise<{ token: string; user: AuthUser }>;
   };
 
   const signUp = async (payload: SignUpPayload) => {
@@ -89,8 +98,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const login = async (payload: LoginPayload) => {
-    const { token: nextToken, user: nextUser } = await performAuthRequest("/api/auth/login", payload);
-    persistSession(nextUser, nextToken);
+    try {
+      const { token: nextToken, user: nextUser } = await performAuthRequest("/api/auth/login", payload);
+      if (!nextToken || !nextUser) {
+        throw new Error("Invalid response from server");
+      }
+      persistSession(nextUser, nextToken);
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
+    }
   };
 
   const logout = () => {
