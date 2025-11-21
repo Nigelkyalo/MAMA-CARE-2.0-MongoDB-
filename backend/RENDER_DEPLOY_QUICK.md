@@ -13,8 +13,8 @@ Visit https://dashboard.render.com
 - **Name**: `mamacare-backend`
 - **Root Directory**: `backend` ⚠️ **CRITICAL: Set this!**
 - **Environment**: `Node`
-- **Build Command**: `npm install`
-- **Start Command**: `npm run start:dev` (uses ts-node directly, no build needed)
+- **Build Command**: `npm install && npm run build`
+- **Start Command**: `node dist/index.js`
 
 **Environment Variables (Add these):**
 ```

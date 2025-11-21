@@ -34,7 +34,7 @@ Fill in the following settings:
 - **Root Directory**: `backend` ⚠️ **IMPORTANT: Set this to `backend`**
 - **Runtime**: `Node`
 - **Build Command**: `npm install && npm run build`
-- **Start Command**: `npm start`
+- **Start Command**: `node dist/index.js`
 
 ### Environment Variables:
 
