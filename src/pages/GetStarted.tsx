@@ -189,15 +189,18 @@ const GetStarted = () => {
       // Store in localStorage
       localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profileToSave));
       
+      // Trigger custom event so dashboard can refresh immediately (for same-tab updates)
+      window.dispatchEvent(new CustomEvent("profileUpdated"));
+      
       setStatus({
         type: "success",
-        message: "Your pregnancy profile has been saved successfully!",
+        message: "Your pregnancy profile has been saved successfully! Redirecting to dashboard...",
       });
 
-      // Immediately redirect to dashboard
+      // Immediately redirect to dashboard (reduced delay for faster experience)
       setTimeout(() => {
-        navigate("/dashboard");
-      }, 1000);
+        navigate("/dashboard", { replace: true });
+      }, 800);
     } catch (error) {
       console.error("Error saving pregnancy profile:", error);
       const message = error instanceof Error ? error.message : "Something went wrong. Please try again.";
