@@ -33,8 +33,8 @@ Fill in the following settings:
 - **Branch**: `main`
 - **Root Directory**: `backend` ⚠️ **IMPORTANT: Set this to `backend`**
 - **Runtime**: `Node`
-- **Build Command**: `npm install && npm run build`
-- **Start Command**: `node dist/index.js`
+- **Build Command**: `npm install` (this installs dependencies and uses ts-node)
+- **Start Command**: `npm start` (runs TypeScript directly using ts-node)
 
 ### Environment Variables:
 

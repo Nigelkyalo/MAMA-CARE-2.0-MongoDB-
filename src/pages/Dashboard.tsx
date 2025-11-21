@@ -55,12 +55,21 @@ const Dashboard = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!token) {
-      navigate("/login");
-      return;
+    if (token) {
+      fetchProfile();
+    } else {
+      // Try to load from localStorage if no auth
+      const savedProfile = localStorage.getItem("mamacare.profile");
+      if (savedProfile) {
+        try {
+          setProfile(JSON.parse(savedProfile) as PregnancyProfile);
+        } catch (e) {
+          console.error("Failed to parse saved profile:", e);
+        }
+      }
+      setLoading(false);
     }
-    fetchProfile();
-  }, [token, navigate]);
+  }, [token]);
 
   const fetchProfile = async () => {
     try {
@@ -73,8 +82,8 @@ const Dashboard = () => {
       });
 
       if (response.status === 404) {
-        // No profile yet, redirect to get-started
-        navigate("/get-started");
+        // No profile yet, just show empty state
+        setProfile(null);
         return;
       }
 
@@ -192,7 +201,7 @@ const Dashboard = () => {
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            Welcome back, {profile.firstName}! 👋
+            Welcome{profile.firstName ? ` back, ${profile.firstName}` : ""}! 👋
           </h1>
           <p className="text-muted-foreground">Here's your personalized pregnancy journey</p>
         </div>

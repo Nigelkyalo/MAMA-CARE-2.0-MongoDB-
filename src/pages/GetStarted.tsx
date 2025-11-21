@@ -158,14 +158,6 @@ const GetStarted = () => {
   }, [profile]);
 
   const handleComplete = async () => {
-    if (!isAuthenticated || !token) {
-      setStatus({
-        type: "error",
-        message: "Please sign in with your MamaCare account before completing setup.",
-      });
-      return;
-    }
-
     if (!canSubmit) {
       setStatus({
         type: "error",
@@ -178,39 +170,46 @@ const GetStarted = () => {
     setStatus(null);
 
     try {
-      const payload = {
-        ...profile,
-        reminders: {
-          appointments: profile.reminders.appointments,
-          medications: profile.reminders.medications,
-          tips: profile.reminders.tips,
-          emergency: profile.reminders.emergency,
-        },
-        ...(profile.calculationMethod === "dueDate"
-          ? { dueDate: profile.date }
-          : { lastMenstrualPeriod: profile.date }),
-      };
+      // If authenticated, try to save to backend
+      if (token) {
+        const payload = {
+          ...profile,
+          reminders: {
+            appointments: profile.reminders.appointments,
+            medications: profile.reminders.medications,
+            tips: profile.reminders.tips,
+            emergency: profile.reminders.emergency,
+          },
+          ...(profile.calculationMethod === "dueDate"
+            ? { dueDate: profile.date }
+            : { lastMenstrualPeriod: profile.date }),
+        };
 
-      const response = await fetch(`${API_BASE_URL}/api/pregnancy-profile`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
+        const response = await fetch(`${API_BASE_URL}/api/pregnancy-profile`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || "Failed to save your profile.");
+        if (response.ok) {
+          setStatus({
+            type: "success",
+            message: "Your pregnancy profile has been saved successfully!",
+          });
+        }
+      } else {
+        // Store in localStorage for non-authenticated users
+        localStorage.setItem("mamacare.profile", JSON.stringify(profile));
+        setStatus({
+          type: "success",
+          message: "Your profile information has been saved!",
+        });
       }
 
-      setStatus({
-        type: "success",
-        message: "Your pregnancy profile has been saved successfully!",
-      });
-
-      // Redirect to dashboard after a short delay
+      // Always redirect to dashboard after a short delay
       setTimeout(() => {
         navigate("/dashboard");
       }, 1500);
