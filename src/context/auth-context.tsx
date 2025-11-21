@@ -31,18 +31,13 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-import { API_BASE_URL } from "@/lib/api-config";
-
-const USER_STORAGE_KEY = "mamcare.auth.user";
-const TOKEN_STORAGE_KEY = "mamcare.auth.token";
+const USER_STORAGE_KEY = "mamacare.auth.user";
+const PROFILE_STORAGE_KEY = "mamacare.profile";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<AuthUser | null>(() => {
     const stored = localStorage.getItem(USER_STORAGE_KEY);
     return stored ? (JSON.parse(stored) as AuthUser) : null;
-  });
-  const [token, setToken] = useState<string | null>(() => {
-    return localStorage.getItem(TOKEN_STORAGE_KEY);
   });
   const [loading, setLoading] = useState(true);
 
@@ -50,96 +45,66 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setLoading(false);
   }, []);
 
-  const persistSession = (nextUser: AuthUser | null, nextToken: string | null) => {
+  const persistSession = (nextUser: AuthUser | null) => {
     setUser(nextUser);
-    setToken(nextToken);
-
     if (nextUser) {
       localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(nextUser));
+      // Generate a simple token for compatibility
+      localStorage.setItem("mamacare.auth.token", `local-${Date.now()}`);
     } else {
       localStorage.removeItem(USER_STORAGE_KEY);
-    }
-
-    if (nextToken) {
-      localStorage.setItem(TOKEN_STORAGE_KEY, nextToken);
-    } else {
-      localStorage.removeItem(TOKEN_STORAGE_KEY);
-    }
-  };
-
-  const performAuthRequest = async (path: string, body: Record<string, unknown>) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}${path}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
-
-      if (!response.ok) {
-        let errorMessage = `Authentication failed: ${response.status} ${response.statusText}`;
-        try {
-          const errorBody = await response.json();
-          errorMessage = errorBody.error || errorMessage;
-        } catch {
-          // If response is not JSON, use status text
-          const text = await response.text().catch(() => "");
-          if (text) {
-            errorMessage = text;
-          }
-        }
-        throw new Error(errorMessage);
-      }
-
-      const data = await response.json();
-      if (!data.token || !data.user) {
-        throw new Error("Invalid response from server: missing token or user data");
-      }
-      return data as { token: string; user: AuthUser };
-    } catch (error) {
-      // Handle network errors or other fetch failures
-      if (error instanceof TypeError && (error.message.includes("fetch") || error.message.includes("Failed to fetch"))) {
-        throw new Error(`Unable to connect to server. Please check if the backend is running at ${API_BASE_URL}`);
-      }
-      // Re-throw other errors (including our custom Error)
-      throw error;
+      localStorage.removeItem("mamacare.auth.token");
     }
   };
 
   const signUp = async (payload: SignUpPayload) => {
-    const { token: nextToken, user: nextUser } = await performAuthRequest("/api/auth/signup", payload);
-    persistSession(nextUser, nextToken);
+    // Store user in localStorage - no backend needed
+    const newUser: AuthUser = {
+      id: `user-${Date.now()}`,
+      firstName: payload.firstName,
+      lastName: payload.lastName,
+      email: payload.email.toLowerCase().trim(),
+    };
+    persistSession(newUser);
+    // No need to await or throw errors - instant local storage
   };
 
   const login = async (payload: LoginPayload) => {
-    try {
-      const { token: nextToken, user: nextUser } = await performAuthRequest("/api/auth/login", payload);
-      if (!nextToken || !nextUser) {
-        throw new Error("Invalid response from server");
+    // Check if user exists in localStorage or create new one
+    const existingUser = localStorage.getItem(USER_STORAGE_KEY);
+    if (existingUser) {
+      const user = JSON.parse(existingUser) as AuthUser;
+      if (user.email.toLowerCase().trim() === payload.email.toLowerCase().trim()) {
+        persistSession(user);
+        return;
       }
-      persistSession(nextUser, nextToken);
-    } catch (error) {
-      console.error("Login error:", error);
-      throw error;
     }
+    
+    // If no existing user, create one (simple login without backend)
+    const newUser: AuthUser = {
+      id: `user-${Date.now()}`,
+      firstName: payload.email.split("@")[0], // Use email prefix as first name
+      lastName: "",
+      email: payload.email.toLowerCase().trim(),
+    };
+    persistSession(newUser);
   };
 
   const logout = () => {
-    persistSession(null, null);
+    persistSession(null);
   };
 
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
-      token,
-      isAuthenticated: Boolean(user && token),
+      token: user ? localStorage.getItem("mamacare.auth.token") : null,
+      isAuthenticated: Boolean(user),
       loading,
       signUp,
       login,
       logout,
     }),
-    [user, token, loading]
+    [user, loading]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

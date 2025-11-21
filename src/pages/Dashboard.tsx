@@ -20,7 +20,7 @@ import {
   Edit,
 } from "lucide-react";
 
-import { API_BASE_URL } from "@/lib/api-config";
+// No backend needed - all data stored locally
 
 interface PregnancyProfile {
   firstName: string;
@@ -48,58 +48,36 @@ interface PregnancyProfile {
 }
 
 const Dashboard = () => {
-  const { user, token, logout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<PregnancyProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (token) {
-      fetchProfile();
-    } else {
-      // Try to load from localStorage if no auth
-      const savedProfile = localStorage.getItem("mamacare.profile");
-      if (savedProfile) {
-        try {
-          setProfile(JSON.parse(savedProfile) as PregnancyProfile);
-        } catch (e) {
-          console.error("Failed to parse saved profile:", e);
-        }
+    // Always load from localStorage - no backend needed
+    const savedProfile = localStorage.getItem(PROFILE_STORAGE_KEY);
+    if (savedProfile) {
+      try {
+        const parsed = JSON.parse(savedProfile);
+        // Ensure the profile has the expected structure
+        setProfile({
+          ...parsed,
+          // Fill in any missing fields with defaults
+          reminders: parsed.reminders || {
+            appointments: true,
+            medications: true,
+            tips: true,
+            emergency: true,
+          },
+        });
+      } catch (e) {
+        console.error("Failed to parse saved profile:", e);
+        setError("Failed to load your profile");
       }
-      setLoading(false);
     }
-  }, [token]);
-
-  const fetchProfile = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await fetch(`${API_BASE_URL}/api/pregnancy-profile`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.status === 404) {
-        // No profile yet, just show empty state
-        setProfile(null);
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch profile");
-      }
-
-      const data = await response.json();
-      setProfile(data.data);
-    } catch (err) {
-      console.error("Error fetching profile:", err);
-      setError(err instanceof Error ? err.message : "Failed to load your profile");
-    } finally {
-      setLoading(false);
-    }
-  };
+    setLoading(false);
+  }, []);
 
   const calculatePregnancyProgress = () => {
     if (!profile) return { weeks: 0, days: 0, percentage: 0 };

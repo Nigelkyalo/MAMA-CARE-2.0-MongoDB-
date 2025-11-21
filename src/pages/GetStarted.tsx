@@ -55,7 +55,7 @@ const HEALTH_CONDITIONS = [
 
 const LANGUAGES = ["english", "swahili", "kikuyu", "luo"] as const;
 const COUNTIES = ["nairobi", "mombasa", "kisumu", "nakuru", "other"] as const;
-import { API_BASE_URL } from "@/lib/api-config";
+const PROFILE_STORAGE_KEY = "mamacare.profile";
 
 const GetStarted = () => {
   const navigate = useNavigate();
@@ -170,49 +170,34 @@ const GetStarted = () => {
     setStatus(null);
 
     try {
-      // If authenticated, try to save to backend
-      if (token) {
-        const payload = {
-          ...profile,
-          reminders: {
-            appointments: profile.reminders.appointments,
-            medications: profile.reminders.medications,
-            tips: profile.reminders.tips,
-            emergency: profile.reminders.emergency,
-          },
-          ...(profile.calculationMethod === "dueDate"
-            ? { dueDate: profile.date }
-            : { lastMenstrualPeriod: profile.date }),
-        };
+      // Save profile to localStorage - no backend needed
+      const profileToSave = {
+        ...profile,
+        reminders: {
+          appointments: profile.reminders.appointments,
+          medications: profile.reminders.medications,
+          tips: profile.reminders.tips,
+          emergency: profile.reminders.emergency,
+        },
+        ...(profile.calculationMethod === "dueDate"
+          ? { dueDate: profile.date }
+          : { lastMenstrualPeriod: profile.date }),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
 
-        const response = await fetch(`${API_BASE_URL}/api/pregnancy-profile`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(payload),
-        });
+      // Store in localStorage
+      localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profileToSave));
+      
+      setStatus({
+        type: "success",
+        message: "Your pregnancy profile has been saved successfully!",
+      });
 
-        if (response.ok) {
-          setStatus({
-            type: "success",
-            message: "Your pregnancy profile has been saved successfully!",
-          });
-        }
-      } else {
-        // Store in localStorage for non-authenticated users
-        localStorage.setItem("mamacare.profile", JSON.stringify(profile));
-        setStatus({
-          type: "success",
-          message: "Your profile information has been saved!",
-        });
-      }
-
-      // Always redirect to dashboard after a short delay
+      // Immediately redirect to dashboard
       setTimeout(() => {
         navigate("/dashboard");
-      }, 1500);
+      }, 1000);
     } catch (error) {
       console.error("Error saving pregnancy profile:", error);
       const message = error instanceof Error ? error.message : "Something went wrong. Please try again.";

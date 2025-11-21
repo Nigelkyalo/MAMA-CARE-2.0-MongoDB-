@@ -20,7 +20,9 @@ const Login = () => {
     setIsSubmitting(true);
 
     try {
+      // Login works instantly with localStorage - no backend needed
       await login(form);
+      // Immediately redirect to dashboard
       navigate("/dashboard");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unable to sign in. Please try again.";
