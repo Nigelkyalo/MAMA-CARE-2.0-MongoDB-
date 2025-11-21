@@ -31,9 +31,10 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
+import { API_BASE_URL } from "@/lib/api-config";
+
 const USER_STORAGE_KEY = "mamcare.auth.user";
 const TOKEN_STORAGE_KEY = "mamcare.auth.token";
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:4000";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<AuthUser | null>(() => {

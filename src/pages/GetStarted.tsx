@@ -55,7 +55,7 @@ const HEALTH_CONDITIONS = [
 
 const LANGUAGES = ["english", "swahili", "kikuyu", "luo"] as const;
 const COUNTIES = ["nairobi", "mombasa", "kisumu", "nakuru", "other"] as const;
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:4000";
+import { API_BASE_URL } from "@/lib/api-config";
 
 const GetStarted = () => {
   const navigate = useNavigate();
