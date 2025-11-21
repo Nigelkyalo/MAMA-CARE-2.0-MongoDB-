@@ -18,7 +18,7 @@ import {
   AlertCircle,
   ShieldCheck
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/auth-context";
 
 type CalculationMethod = "dueDate" | "lastMenstrualPeriod";
@@ -58,6 +58,7 @@ const COUNTIES = ["nairobi", "mombasa", "kisumu", "nakuru", "other"] as const;
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:4000";
 
 const GetStarted = () => {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const totalSteps = 4;
   const progress = (step / totalSteps) * 100;
@@ -208,6 +209,11 @@ const GetStarted = () => {
         type: "success",
         message: "Your pregnancy profile has been saved successfully!",
       });
+
+      // Redirect to dashboard after a short delay
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1500);
     } catch (error) {
       console.error("Error saving pregnancy profile:", error);
       const message = error instanceof Error ? error.message : "Something went wrong. Please try again.";

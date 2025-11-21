@@ -21,7 +21,7 @@ const Login = () => {
 
     try {
       await login(form);
-      navigate("/get-started");
+      navigate("/dashboard");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unable to sign in. Please try again.";
       setError(message);

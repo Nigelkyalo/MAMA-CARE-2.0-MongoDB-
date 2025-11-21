@@ -15,7 +15,9 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
+import Dashboard from "./pages/Dashboard";
 import { AuthProvider } from "./context/auth-context";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -30,7 +32,6 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/features" element={<Features />} />
             <Route path="/support" element={<Support />} />
-            <Route path="/get-started" element={<GetStarted />} />
             <Route path="/download-app" element={<DownloadApp />} />
             <Route path="/help-center" element={<HelpCenter />} />
             <Route path="/contact-us" element={<ContactUs />} />
@@ -38,6 +39,22 @@ const App = () => (
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/get-started"
+              element={
+                <ProtectedRoute>
+                  <GetStarted />
+                </ProtectedRoute>
+              }
+            />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

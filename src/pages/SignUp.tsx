@@ -43,7 +43,7 @@ const SignUp = () => {
         email: form.email,
         password: form.password,
       });
-      navigate("/get-started");
+      navigate("/dashboard");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unable to create your account. Please try again.";
       setError(message);

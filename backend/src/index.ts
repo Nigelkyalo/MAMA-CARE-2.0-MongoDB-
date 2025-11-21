@@ -68,7 +68,7 @@ const app = express();
 app.use(
   cors({
     origin: "*",
-    methods: ["GET", "POST", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
@@ -153,6 +153,30 @@ app.post("/api/auth/login", async (req: Request, res: Response) => {
   }
 });
 
+app.get("/api/pregnancy-profile", async (req: Request, res: Response) => {
+  try {
+    const userId = extractUserIdFromRequest(req);
+    if (!userId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const collection = await getCollection("pregnancy_profiles");
+    const profile = await collection.findOne({ userId }, { sort: { createdAt: -1 } });
+
+    if (!profile) {
+      return res.status(404).json({ error: "No pregnancy profile found" });
+    }
+
+    return res.json({
+      success: true,
+      data: profile,
+    });
+  } catch (error) {
+    console.error("Failed to fetch pregnancy profile:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 app.post("/api/pregnancy-profile", async (req: Request, res: Response) => {
   try {
     const userId = extractUserIdFromRequest(req);
@@ -166,19 +190,37 @@ app.post("/api/pregnancy-profile", async (req: Request, res: Response) => {
     }
 
     const collection = await getCollection("pregnancy_profiles");
+    const existing = await collection.findOne({ userId });
+
     const doc = {
       ...profile,
       userId,
-      createdAt: new Date(),
       updatedAt: new Date(),
     };
 
-    const result = await collection.insertOne(doc);
-    return res.status(201).json({
-      success: true,
-      message: "Pregnancy profile saved successfully",
-      data: { id: result.insertedId, ...doc },
-    });
+    if (existing) {
+      // Update existing profile
+      await collection.updateOne({ userId }, { $set: doc });
+      const updated = await collection.findOne({ userId });
+      return res.json({
+        success: true,
+        message: "Pregnancy profile updated successfully",
+        data: updated,
+      });
+    } else {
+      // Create new profile
+      const newDoc = {
+        ...doc,
+        createdAt: new Date(),
+      };
+      const result = await collection.insertOne(newDoc);
+      const created = await collection.findOne({ _id: result.insertedId });
+      return res.status(201).json({
+        success: true,
+        message: "Pregnancy profile saved successfully",
+        data: created,
+      });
+    }
   } catch (error) {
     console.error("Failed to save pregnancy profile:", error);
     return res.status(500).json({ error: "Internal server error" });
