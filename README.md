@@ -11,7 +11,8 @@ A comprehensive pregnancy care application built with React, TypeScript, and Mon
 - 🏥 **Healthcare Management**: Connect with your preferred hospitals and clinics
 - 💬 **Multi-language Support**: Available in English, Swahili, Kikuyu, and Luo
 - 📱 **Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
-- 💾 **Local Storage**: All data stored securely in your browser for privacy
+- 🔐 **Secure Authentication**: User registration and login with JWT token-based authentication
+- 💾 **MongoDB Atlas Integration**: All data stored securely in MongoDB Atlas cloud database
 
 ## Technologies
 
@@ -26,9 +27,18 @@ This project is built with modern web technologies:
   - React Router DOM
   - React Query (TanStack Query)
 
-- **Data Storage**:
-  - Browser localStorage for client-side data persistence
-  - All data stored locally in the user's browser
+- **Backend**:
+  - Node.js
+  - Express.js
+  - TypeScript
+  - MongoDB Atlas (Cloud Database)
+  - JWT for authentication
+  - bcryptjs for password hashing
+
+- **Database**:
+  - MongoDB Atlas (Cloud Database)
+  - MongoDB Driver for Node.js
+  - Collections: `users`, `pregnancy_profiles`
 
 ## Project Structure
 
@@ -50,43 +60,156 @@ expecting-ease-care/
 
 - Node.js (v18 or higher)
 - npm or yarn
+- MongoDB Atlas account (or local MongoDB instance)
 
 ### Installation
 
 1. **Clone the repository**
-   ```sh
+```sh
    git clone https://github.com/Nigelkyalo/MAMA-CARE-2.0-MongoDB-.git
    cd MAMA-CARE-2.0-MongoDB-
    ```
 
 2. **Install frontend dependencies**
-```sh
+   ```sh
    npm install
    ```
 
-3. **Start the development server**
-
+3. **Install backend dependencies**
    ```sh
-npm run dev
-```
-   The application will be available at `http://localhost:8080` (or another port if 8080 is in use)
+   cd backend
+   npm install
+   cd ..
+   ```
 
-   **Note**: No backend server or database setup is required. The app runs entirely in the browser using localStorage for data storage.
+4. **Set up environment variables**
 
-## Data Storage
+   Create a `.env` file in the root directory:
+   ```env
+   MONGODB_URI=mongodb+srv://kyalomuchende_db_user:1234@cluster101.chqmam8.mongodb.net/mamacare?retryWrites=true&w=majority
+   MONGODB_DB=mamacare
+   VITE_MONGODB_URI=mongodb+srv://kyalomuchende_db_user:1234@cluster101.chqmam8.mongodb.net/mamacare?retryWrites=true&w=majority
+   VITE_MONGODB_DB=mamacare
+   PORT=4000
+   VITE_API_BASE_URL=http://localhost:4000
+   JWT_SECRET=your_jwt_secret_key_here
+   ```
 
-The application uses browser localStorage for all data storage:
+   Create a `backend/.env` file:
+   ```env
+   PORT=4000
+   MONGODB_URI=mongodb+srv://kyalomuchende_db_user:1234@cluster101.chqmam8.mongodb.net/mamacare?retryWrites=true&w=majority
+   MONGODB_DB=mamacare
+   JWT_SECRET=your_jwt_secret_key_here
+   ```
 
-- **User Authentication**: Stored locally in browser
-- **Pregnancy Profiles**: Saved to browser localStorage
-- **Privacy**: All data remains on the user's device
-- **No Backend Required**: Works completely offline
+5. **Start the development servers**
+
+   Terminal 1 - Frontend:
+   ```sh
+   npm run dev
+   ```
+   The frontend will be available at `http://localhost:8080` (or another port if 8080 is in use)
+
+   Terminal 2 - Backend:
+   ```sh
+   cd backend
+   npm run dev
+   ```
+   The backend API will be available at `http://localhost:4000`
+
+## MongoDB Atlas Configuration
+
+The application is configured to use MongoDB Atlas cloud database:
+
+- **Cluster**: `cluster101.chqmam8.mongodb.net`
+- **Database Name**: `mamacare`
+- **Username**: `kyalomuchende_db_user`
+- **Authentication**: Username and password-based authentication with MongoDB Atlas
+- **Connection String**: `mongodb+srv://kyalomuchende_db_user:1234@cluster101.chqmam8.mongodb.net/mamacare?retryWrites=true&w=majority`
+
+### MongoDB Collections
+
+The application uses the following MongoDB collections:
+
+1. **`users`** - Stores user authentication information
+   - `_id`: ObjectId
+   - `firstName`: string
+   - `lastName`: string
+   - `email`: string (unique, indexed)
+   - `passwordHash`: string (bcrypt hashed)
+   - `createdAt`: Date
+   - `updatedAt`: Date
+
+2. **`pregnancy_profiles`** - Stores pregnancy profile data
+   - `_id`: ObjectId
+   - `userId`: string (references users._id)
+   - `firstName`: string
+   - `lastName`: string
+   - `email`: string
+   - `phone`: string
+   - `age`: string
+   - `calculationMethod`: "dueDate" | "lastMenstrualPeriod"
+   - `dueDate`: string (optional)
+   - `lastMenstrualPeriod`: string (optional)
+   - `pregnancyNumber`: string
+   - `location`: string
+   - `hospital`: string
+   - `healthConditions`: string[]
+   - `language`: string
+   - `reminders`: object
+   - `communicationMethod`: string
+   - `agreedToTerms`: boolean
+   - `createdAt`: Date
+   - `updatedAt`: Date
+
+### MongoDB Connection Setup
+
+1. **MongoDB Atlas Setup**:
+   - Ensure your MongoDB Atlas cluster allows connections from your IP address
+   - Add your IP address to the IP Access List in MongoDB Atlas dashboard
+   - Verify the database user credentials match your `.env` files
+
+2. **Connection Verification**:
+   - The backend automatically connects to MongoDB Atlas on startup
+   - Check backend logs for successful connection confirmation
+   - If connection fails, verify your MongoDB URI and network access settings
+
+## Authentication System
+
+MamaCare uses a custom authentication system built with JWT tokens and MongoDB:
+
+### API Endpoints
+
+- `POST /api/auth/signup` - Register a new user
+  - Requires: `firstName`, `lastName`, `email`, `password`
+  - Stores user in MongoDB `users` collection
+  - Returns: JWT token and user profile
+
+- `POST /api/auth/login` - Authenticate existing user
+  - Requires: `email`, `password`
+  - Validates credentials against MongoDB `users` collection
+  - Returns: JWT token and user profile
+
+- `GET /api/pregnancy-profile` - Fetch user's pregnancy profile (Protected)
+  - Requires: `Authorization: Bearer <token>` header
+  - Fetches profile from MongoDB `pregnancy_profiles` collection
+  - Returns: User's pregnancy profile data
+
+- `POST /api/pregnancy-profile` - Save/Update pregnancy profile (Protected)
+  - Requires: `Authorization: Bearer <token>` header
+  - Requires: Complete pregnancy profile data
+  - Upserts profile in MongoDB `pregnancy_profiles` collection
+  - Returns: Saved/updated profile data
+
+- `GET /api/health` - Health check endpoint
+  - Returns: `{ status: "ok" }`
 
 ### Frontend Routes
 
-- `/login` - User login page (stores data locally)
-- `/get-started` - Multi-step pregnancy profile setup form
-- `/dashboard` - Personalized dashboard showing all entered details
+- `/login` - User login page (authenticates with MongoDB)
+- `/get-started` - Multi-step pregnancy profile setup form (saves to MongoDB)
+- `/dashboard` - Personalized dashboard showing all details from MongoDB
 
 ## Deployment
 
@@ -105,7 +228,34 @@ The application is deployed on Vercel:
 
 ### Environment Variables for Production
 
-**Note**: No environment variables are required as the app uses browser localStorage for all data storage.
+Make sure to set all the environment variables in your Vercel project settings, including:
+
+**Frontend Environment Variables (Vercel)**:
+- `VITE_MONGODB_URI` - MongoDB Atlas connection string
+- `VITE_MONGODB_DB` - MongoDB database name
+- `VITE_API_BASE_URL` - Your backend API URL (e.g., Render backend URL)
+
+**Backend Environment Variables (Render/Backend Host)**:
+- `MONGODB_URI` - MongoDB Atlas connection string
+- `MONGODB_DB` - MongoDB database name
+- `JWT_SECRET` - Secret key for JWT token signing
+- `PORT` - Server port (default: 4000)
+
+### MongoDB Atlas Production Configuration
+
+1. **Network Access**: Ensure your MongoDB Atlas cluster allows connections from:
+   - Your Render backend server IP (if using Render)
+   - Vercel serverless function IPs (if using Vercel serverless functions)
+   - Or use `0.0.0.0/0` for development (not recommended for production)
+
+2. **Database User**: Ensure the MongoDB user has appropriate permissions:
+   - Read and write access to the `mamacare` database
+   - Access to create collections if needed
+
+3. **Connection String**: Use the connection string format:
+   ```
+   mongodb+srv://<username>:<password>@cluster101.chqmam8.mongodb.net/mamacare?retryWrites=true&w=majority
+   ```
 
 ## Contributing
 
